@@ -1,27 +1,30 @@
 #!/usr/bin/env node
-const Path = require('path')
-const fs = require('fs')
+
 const JMock = require('./dist/jmock')
 
 const args = {}
 process.argv.slice(2).forEach((arg) => {
-  if (/--(.+)=(.+)/.test(arg)) {
+  if (/--?(.+)=(.+)/.test(arg)) {
     args[RegExp.$1] = RegExp.$2
   }
 })
 
-let port = args.port || 3000
+let port = args.port || args.p || 3000
 
+let filePath = args.file || args.f
 let data = {}
-if ('data' in args) {
+if (filePath) {
   try {
-    data = JSON.parse(fs.readFileSync(Path.resolve(args.data)))
+    const fileData = require('fs').readFileSync(require('path').resolve(filePath)).toString()
+    if (/(\{[\s\S]*\})/.test(fileData)) {
+      eval(`data = ${RegExp.$1}`)
+    } else {
+      throw new Error('The file seems not to define the mock content.')
+    }
   } catch(e) {
-    console.log('Something error occurs when loading data file: \n' + e)
+    console.error('Something error occurs when loading data file: \n' + e)
   }
 }
 
-console.log(args, port, data, Path.resolve(args.data))
-
-const jMock = new JMock(data)
-jMock.start(port)
+const jmock = new JMock(data)
+jmock.start(port)

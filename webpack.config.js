@@ -52,7 +52,7 @@ module.exports = (_, args) => {
               keep_fnames: true,
             },
             compress: {
-              drop_console: true,
+              drop_console: false,
               drop_debugger: true,
             },
             output: {

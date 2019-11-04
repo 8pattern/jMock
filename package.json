@@ -27,9 +27,9 @@
     "jest-cli": "^24.9.0",
     "terser-webpack-plugin": "^2.1.0",
     "ts-jest": "^24.1.0",
-    "ts-node-dev": "^1.0.0-pre.43",
+    "ts-node-dev": "^1.0.0-pre.44",
     "typescript": "^3.6.3",
-    "webpack": "^4.40.2",
+    "webpack": "^4.41.2",
     "webpack-cli": "^3.3.9"
   },
   "dependencies": {

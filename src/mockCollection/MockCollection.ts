@@ -34,23 +34,21 @@ export default class MockCollection {
   }
 
   load(mockData: MockData = {}) {
-    const legalData = {}
     Object.keys(mockData)
       .forEach((url) => {
-        const legalUrl = MockCollection.getLegalUrl(url)
         const mockContent = mockData[url]
         Object.keys(mockContent)
           .forEach((method) => {
-            const legalMethod = MockCollection.getLegalMethod(method)
-            legalData[legalUrl][legalMethod] = mockContent[method]
+            const content = mockContent[method]
+            this.set(url, method, content)
           })
       })
-    this.data = mockData
   }
 
   set(url: string, method: string, content: AvailableMockParameter): void {
     const legalUrl = MockCollection.getLegalUrl(url)
     const legalMethod = MockCollection.getLegalMethod(method)
+    this.data[legalUrl] = this.data[legalUrl] || {}
     this.data[legalUrl][legalMethod] = content
   }
 

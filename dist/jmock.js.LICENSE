@@ -27,7 +27,7 @@
  */
 
 /*!
- * statuses
+ * http-errors
  * Copyright(c) 2014 Jonathan Ong
  * Copyright(c) 2016 Douglas Christopher Wilson
  * MIT Licensed
@@ -54,7 +54,7 @@
  */
 
 /*!
- * http-errors
+ * statuses
  * Copyright(c) 2014 Jonathan Ong
  * Copyright(c) 2016 Douglas Christopher Wilson
  * MIT Licensed
@@ -110,12 +110,6 @@
 /*!
  * depd
  * Copyright(c) 2014-2015 Douglas Christopher Wilson
- * MIT Licensed
- */
-
-/*!
- * toidentifier
- * Copyright(c) 2016 Douglas Christopher Wilson
  * MIT Licensed
  */
 
@@ -180,6 +174,12 @@
  * body-parser
  * Copyright(c) 2014 Jonathan Ong
  * Copyright(c) 2014-2015 Douglas Christopher Wilson
+ * MIT Licensed
+ */
+
+/*!
+ * toidentifier
+ * Copyright(c) 2016 Douglas Christopher Wilson
  * MIT Licensed
  */
 
