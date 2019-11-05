@@ -1,14 +1,16 @@
 {
   "name": "@8pattern/jmock",
-  "version": "0.1.0",
-  "description": "a mock lib for JS",
+  "version": "0.1.1",
+  "description": "a mock server for JS",
   "scripts": {
     "dev": "ts-node-dev ./src",
     "build": "webpack --mode=production",
     "test": "jest"
   },
   "keywords": [
-    "mock"
+    "mock",
+    "http",
+    "websocket"
   ],
   "author": "8th-pattern",
   "license": "MIT",

@@ -15,12 +15,7 @@ let filePath = args.file || args.f
 let data = {}
 if (filePath) {
   try {
-    const fileData = require('fs').readFileSync(require('path').resolve(filePath)).toString()
-    if (/(\{[\s\S]*\})/.test(fileData)) {
-      eval(`data = ${RegExp.$1}`)
-    } else {
-      throw new Error('The file seems not to define the mock content.')
-    }
+    data = require(require('path').resolve(filePath))
   } catch(e) {
     console.error('Something error occurs when loading data file: \n' + e)
   }
