@@ -19,11 +19,11 @@ The MockData is defined as following:
 
 ```javascript
 {
-	[PATH]: {
-		[METHOD1]: [MockItem1],
-		[METHOD2]: [MockItem2],
+	[Path]: {
+		[Method1]: [MockItem1],
+		[Method2]: [MockItem2],
 	},
-	[PATH2]: { ... }
+	[Path2]: { ... }
 }
 ```
 
@@ -47,34 +47,34 @@ For example:
 		}
 	},
 	'/ws/mock': {
-        WS: (cb, req) => {
-            if (req.id) {
-                cb('@name')
-            }
-        }
-    }
+		WS: (cb, req) => {
+		    if (req.id) {
+			cb('@name')
+		    }
+		}
+	}
 }
 ```
 
-+ **PATH** <string>
++ **Path** &lt;string&gt;
   
-  1. It can receive an exact or fuzzy path to match the request url.
-  
-2. The usage of fuzzy path is same as RegExp, but you **CAN NOT** define it as RegExp, i.e., *'a/b/.\*'* rather than */a/b/.\*/*. (Because object can't receive RegExp directly as a key.)
-  
-  3. if the exact path and fuzzy path match a request simultanously, **the exact path will have the HIGHER priority**.
+	1. It can receive an exact or fuzzy path to match the request url.
+
+	2. The usage of fuzzy path is same as RegExp, but you **CAN NOT** define it as RegExp, i.e., *'a/b/.\*'* rather than */a/b/.\*/*. (Because object can't receive RegExp directly as a key.)
+
+	3. if the exact path and fuzzy path match a request simultanously, **the exact path will have the HIGHER priority**.
   
      
   
-+ **MEHTOD**<string>
++ **Method**&lt;string&gt;
 
-   1. **All HTTP methods** supported by [Express.js](http://expressjs.com/) also **SUPPORTED** by us.
+	1. **All HTTP methods** supported by [Express.js](http://expressjs.com/) also **SUPPORTED** by us.
 
-   2. Particularly, **WS** will be used to present the websocket method.
+	2. Particularly, **WS** will be used to present the websocket method.
 
       
 
- + **MockItem**: <string> | <object> | <array> | <function>
+ + **MockItem**: &lt;string&gt; | &lt;object&gt; | &lt;array&gt; | &lt;function&gt;
 
    1. string  / object / array
 
@@ -91,19 +91,19 @@ For example:
 
    2. function
 
-      + argument: callback<function>, reqParams<object>
+      + argument: callback&lt;function&gt;, reqParams&lt;object&gt;
       + return：<void>
 
      ```javascript
-       function(cb, req) {
-           if(req.id === 0) {
-               cb('success')
-           } else {
-               setTimeout(() => {
-                   cb('fail')
-               }, 200)
-           }
-       }
+	function(cb, req) {
+	   if(req.id === 0) {
+	       cb('success')
+	   } else {
+	       setTimeout(() => {
+		   cb('fail')
+	       }, 200)
+	   }
+	}
      ```
 
     The callback function also receive a MockItem (**except function**) as the only argument, so the grammer of  [mockjs](http://mockjs.com/) also works. For example:
@@ -135,18 +135,12 @@ module.exports = {
 jmock [--file=./mockdata.js] [--port=3000]
 ```
 
-​	Two arguments should be defined:
-
+Two arguments should be defined:
 + mock file: **--file** or **-f**
-
   1. e.g., --file=./mockdata.js.
-
   2. if not asign it, the mock data will be {} by default 
-
 + port: **--port** or **-p**
-
   1. e.g., --port=3001
-
   2. **3000** by default
 
      
@@ -169,4 +163,4 @@ jmock.start(port)
 
 
 
-**ENJOY YOUR MOCK DATA NOW!**
+> **ENJOY YOUR MOCK DATA NOW!**
