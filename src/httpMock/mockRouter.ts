@@ -9,8 +9,14 @@ import { colorConsole, ConsoleColor, ConsoleBgColor, dateformat } from '../util'
 export default function HttpRouter(mockCollection: MockCollection) {
   const router = express.Router()
 
-  router.use(bodyParser.urlencoded({ extended: true }))
   router.use(bodyParser.json())
+
+  router.all('*', (req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*')
+    res.header('Access-Control-Allow-Headers', 'Authorization, Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, X-Requested-By, If-Modified-Since, X-File-Name, X-File-Type, Cache-Control, Origin')
+    res.header('Access-Control-Allow-Methods', 'PUT,POST,GET,DELETE,OPTIONS')
+    next()
+  })
 
   router.all('*', (req, res) => {
     const { url: originUrl, method } = req
