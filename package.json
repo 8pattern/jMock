@@ -4,8 +4,11 @@
   "description": "a mock server for JS",
   "scripts": {
     "dev": "ts-node-dev ./src",
+    "prebuild": "tsc && npm run test",
     "build": "webpack --mode=production",
-    "test": "jest"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "publish": "npm run build && npm publish --access=public"
   },
   "keywords": [
     "mock",
