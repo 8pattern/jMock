@@ -31,11 +31,11 @@ For example:
 
 ```javascript
 {
-	'/mock/item': {
+	'/mock/item/:productName': {
 		GET: '@name',
-		POST: function(cb, req) {
+		POST: function(cb, req, param) {
 			if (req.id) {
-				cb({ id: req.id, name: '@name' })
+				cb({ id: req.id, name: param.productName })
 			} else {
 				cb({ desc: 'error' })
 			}
@@ -58,13 +58,29 @@ For example:
 
 + **Path** &lt;string&gt;
   
-	1. It can receive an exact or fuzzy path to match the request url.
+	1. It can receive an exact, fuzzy or regular expression pattern to match the request url.
+		+ **Exact**: the url must match the whole pattern, e.g., "/a/b"
+		+ **Fuzzy**: support ":&lt;name&gt;" or "*" to match the url.
+		> + :&lt;name&gt;： match only a sub route, i.e. "/:url" can match "/a", but can **NOT** match "/a/b"
+		> + *:  match any routes, i.e., "/route/\*" can match "/route/1" and "/route/1/2", but can **NOT** match "/1/2"
+		+ **Reg**: use regular expressions as the pattern, i.e., "/(.*?)/(?&lt;id>.&gt;?)" 
+		> + Be aware **NOT** define it as RegExp directly, i.e., use *'a/b/.\*'* rather than */a/b/.\*/*. (Because object can't receive RegExp as a key.)
 
-	2. The usage of fuzzy path is same as RegExp, but you **CAN NOT** define it as RegExp, i.e., *'a/b/.\*'* rather than */a/b/.\*/*. (Because object can't receive RegExp directly as a key.)
+	2. The matched string can be found from the third argument of function.
+		```javascript
+		// URL: /a/b
+		// PATTERN: "/:r1/*" or "/(?<r1>.*)/(.*)"
+		(cb, req, param) => {
+			console.log(
+				param[0], // "a"
+				param[1], // "b"
+				param.r1, // "a"
+			)
+		} 
+		```
 
-	3. if the exact path and fuzzy path match a request simultanously, **the exact path will have the HIGHER priority**.
+	3. priority: **Exact** > **Fuzzy** > **Reg**
   
-     
   
 + **Method**&lt;string&gt;
 
@@ -91,20 +107,22 @@ For example:
 
    2. function
 
-      + argument: callback&lt;function&gt;, reqParams&lt;object&gt;
+      + argument: callback&lt;function&gt;, reqParams&lt;object&gt; routeParams&lt;object&gt;
       + return：<void>
 
-     ```javascript
-	function(cb, req) {
-	   if(req.id === 0) {
-	       cb('success')
-	   } else {
-	       setTimeout(() => {
-		   cb('fail')
-	       }, 200)
-	   }
-	}
-     ```
+	```javascript
+		function(cb, req, param) {
+			if(req.id === 0) {
+				cb('success')
+			} else if (param.name) {
+				cb('success')
+			} else {
+				setTimeout(() => {
+					cb('fail')
+				}, 200)
+			}
+		}
+	```
 
     The callback function also receive a MockItem (**except function**) as the only argument, so the grammer of  [mockjs](http://mockjs.com/) also works. For example:
 
