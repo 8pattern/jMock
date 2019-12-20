@@ -83,11 +83,11 @@ describe('convertFuzzyToRegexpString', () => {
   })
 
   test('":<str>" in routes will convert to a wildcard with a named capture group', () => {
-    expect(convertFuzzyToRegexpString(':url')).toBe('(?<url>.*?)')
-    expect(convertFuzzyToRegexpString('ab/:r')).toBe('ab/(?<r>.*?)')
-    expect(convertFuzzyToRegexpString(':r/cd')).toBe('(?<r>.*?)/cd')
-    expect(convertFuzzyToRegexpString('ab/:r1/:r2')).toBe('ab/(?<r1>.*?)/(?<r2>.*?)')
-    expect(convertFuzzyToRegexpString('a/:r1/:r2/b')).toBe('a/(?<r1>.*?)/(?<r2>.*?)/b')
+    expect(convertFuzzyToRegexpString(':url')).toBe('(?<url>[^\/]*?)')
+    expect(convertFuzzyToRegexpString('ab/:r')).toBe('ab/(?<r>[^\/]*?)')
+    expect(convertFuzzyToRegexpString(':r/cd')).toBe('(?<r>[^\/]*?)/cd')
+    expect(convertFuzzyToRegexpString('ab/:r1/:r2')).toBe('ab/(?<r1>[^\/]*?)/(?<r2>[^\/]*?)')
+    expect(convertFuzzyToRegexpString('a/:r1/:r2/b')).toBe('a/(?<r1>[^\/]*?)/(?<r2>[^\/]*?)/b')
   })
 
   test('":<str>" not in routes won\' change', () => {
@@ -132,39 +132,38 @@ describe('fuzzyMatchRoute', () => {
   })
 
   test('":<str>" in routes can match any route patterns', () => {
-    expect(fuzzyMatchRoute('/', ':url').isMatch).toBeTruthy()
-    expect(fuzzyMatchRoute('/abc', ':url').isMatch).toBeTruthy()
-    expect(fuzzyMatchRoute('/a/b/c', ':url').isMatch).toBeTruthy()
+    expect(fuzzyMatchRoute('/', '/:url').isMatch).toBeTruthy()
+    expect(fuzzyMatchRoute('/', ':url').isMatch).not.toBeTruthy()
+    expect(fuzzyMatchRoute('/abc', '/:url').isMatch).toBeTruthy()
+    expect(fuzzyMatchRoute('/abc', ':url').isMatch).not.toBeTruthy()
+    expect(fuzzyMatchRoute('/a/b/c', ':url').isMatch).not.toBeTruthy()
 
-    expect(fuzzyMatchRoute('/a/b/c', '/a/:url').isMatch).toBeTruthy()
+    expect(fuzzyMatchRoute('/a/b/c', '/a/:url').isMatch).not.toBeTruthy()
     expect(fuzzyMatchRoute('/a/b/c', '/a/b/:url').isMatch).toBeTruthy()
     expect(fuzzyMatchRoute('/a/b/c', '/a/:url/c').isMatch).toBeTruthy()
-    expect(fuzzyMatchRoute('/a/b/c', '/:url/c').isMatch).toBeTruthy()
+    expect(fuzzyMatchRoute('/a/b/c', '/:url/c').isMatch).not.toBeTruthy()
 
     expect(fuzzyMatchRoute('/a/b/c', '/:url/a').isMatch).not.toBeTruthy()
   })
 
   test('":<str>" matched patterns can get from its name', () => {
-    expect(fuzzyMatchRoute('/', ':url').param.url).toBe('/')
-    expect(fuzzyMatchRoute('/abc', ':url').param.url).toBe('/abc')
-    expect(fuzzyMatchRoute('/a/b/c', ':url').param.url).toBe('/a/b/c')
+    expect(fuzzyMatchRoute('/', '/:url').param.url).toBe('')
+    expect(fuzzyMatchRoute('/abc', '/:url').param.url).toBe('abc')
 
-    expect(fuzzyMatchRoute('/a/b/c', '/a/:url').param.url).toBe('b/c')
     expect(fuzzyMatchRoute('/a/b/c', '/a/b/:url').param.url).toBe('c')
     expect(fuzzyMatchRoute('/a/b/c', '/a/:url/c').param.url).toBe('b')
-    expect(fuzzyMatchRoute('/a/b/c', '/:url/c').param.url).toBe('a/b')
 
-    expect(fuzzyMatchRoute('/a/b/c', '/:r1/:r2').param.r1).toBe('a')
-    expect(fuzzyMatchRoute('/a/b/c', '/:r1/:r2').param.r2).toBe('b/c')
+    expect(fuzzyMatchRoute('/a/b', '/:r1/:r2').param.r1).toBe('a')
+    expect(fuzzyMatchRoute('/a/b', '/:r1/:r2').param.r2).toBe('b')
 
     expect(fuzzyMatchRoute('/a/b/c', '/:r1/:r2/:r3').param.r3).toBe('c')
   })
 
   test('hybrid patterns', () => {
     expect(fuzzyMatchRoute('/a/b/c', '/*/:r2').param.length).toBe(2)
-    expect(fuzzyMatchRoute('/a/b/c', '/*/:r2').param[0]).toBe('a')
-    expect(fuzzyMatchRoute('/a/b/c', '/*/:r2').param[1]).toBe('b/c')
-    expect(fuzzyMatchRoute('/a/b/c', '/*/:r2').param.r2).toBe('b/c')
+    expect(fuzzyMatchRoute('/a/b/c', '/*/:r2').param[0]).toBe('a/b')
+    expect(fuzzyMatchRoute('/a/b/c', '/*/:r2').param[1]).toBe('c')
+    expect(fuzzyMatchRoute('/a/b/c', '/*/:r2').param.r2).toBe('c')
 
     expect(fuzzyMatchRoute('/a/b/c', '/:r1/*').param.length).toBe(2)
     expect(fuzzyMatchRoute('/a/b/c', '/:r1/*').param[0]).toBe('a')

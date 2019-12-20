@@ -54,17 +54,19 @@ export default class MockCollection {
     return false
   }
 
-  get(urlPattern: string, method: string): [ValidMockParam, MatchParam] | null {
+  get(url: string, method: string): [ValidMockParam, MatchParam] | null {
     const legalMethod = getLegalMethod(method)
     let matchFn = [exactMatchRoute, fuzzyMatchRoute, regMatchRoute]
     let matchResult: [ValidMockParam, MatchParam] | null = null
 
     Object.entries(this.data)
-      .forEach(([url, mockContent]) => {
-        matchFn.some((fn, index) => {
+      .forEach(([urlPattern, mockContent]) => {
+        matchFn.forEach((fn, index) => {
           const matchRes = fn(url, urlPattern)
-          matchResult = [mockContent[legalMethod], matchRes.param]
-          matchFn = matchFn.slice(0, index)
+          if (matchRes.isMatch) {
+            matchResult = [mockContent[legalMethod], matchRes.param]
+            matchFn = matchFn.slice(0, index)
+          }
         })
       })
     return matchResult

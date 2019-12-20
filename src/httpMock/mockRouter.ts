@@ -39,15 +39,16 @@ export default function HttpRouter(mockCollection: MockCollection) {
       res.send(content)
     }
 
-    const mockPattern = mockCollection.get(url, method)
+    const mockData = mockCollection.get(url, method)
 
-    if (isNull(mockPattern)) {
+    if (isNull(mockData)) {
       sendTrigger(`${method} ${url} donesn't have the mock data defination (${currentTime})`)
     } else {
-      if (mockPattern instanceof Function) {
-        mockPattern(sendTrigger, requestParam)
+      const [mockContent, routeParam] = mockData
+      if (mockContent instanceof Function) {
+        mockContent(sendTrigger, requestParam, routeParam)
       } else {
-        sendTrigger(mockPattern)
+        sendTrigger(mockContent)
       }
     }
   })

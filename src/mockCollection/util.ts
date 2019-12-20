@@ -18,28 +18,35 @@ export function exactMatchRoute(route: string, pattern: string): MatchResult {
 }
 
 export function regMatchRoute(route: string, pattern: string): MatchResult {
-  const re = new RegExp(`^${pattern}$`)
-  const result = route.match(re)
-  if (result) {
-    // unnamed groups
-    const param = result.slice(1)
-    // named groups
-    const { groups } = result
-    if (groups) {
-      Object.keys(groups).forEach(key => {
-        param[key] = groups[key]
-      })
+  try {
+    const re = new RegExp(`^${pattern}$`)
+    const result = route.match(re)
+    if (result) {
+      // unnamed groups
+      const param = result.slice(1)
+      // named groups
+      const { groups } = result
+      if (groups) {
+        Object.keys(groups).forEach(key => {
+          param[key] = groups[key]
+        })
+      }
+  
+      return {
+        isMatch: true,
+        param,
+      }
     }
-
+  
     return {
-      isMatch: true,
-      param,
+      isMatch: false,
+      param: [],
     }
-  }
-
-  return {
-    isMatch: false,
-    param: [],
+  } catch(e) {
+    return {
+      isMatch: false,
+      param: [],
+    }
   }
 }
 
@@ -48,8 +55,8 @@ export function convertFuzzyToRegexpString(fuzzyPattern: string): string {
     .replace(/(?<!\/)([\.\*])(?!\/)/g, '\$1') // 't.ttt*tt' -> 't\.ttt\*tt'
     .replace(/(?<=\/)\*(?=\/)/g, '(.*?)') // '/*/t' -> '/(.*)/t'
     .replace(/(?<=\/)\*$/g, '(.*?)') // '/t/*' -> '/t/(.*)'
-    .replace(/(?<=\/):(.+?)(?=\/)/g, '(?<$1>.*?)') // '/:id/t' -> '/(?<id>.*)/t'
-    .replace(/(?<=\/):(.+?)$/g, '(?<$1>.*?)') // '/t/:id' -> '/t/(?<id>.*)'
+    .replace(/(?<=\/):(.+?)(?=\/)/g, '(?<$1>[^\/]*?)') // '/:id/t' -> '/(?<id>[^\/]*)/t'
+    .replace(/(?<=\/):(.+?)$/g, '(?<$1>[^\/]*?)') // '/t/:id' -> '/t/(?<id>[^\/]*)'
     .slice(1, -1)
 }
 
