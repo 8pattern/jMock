@@ -26,7 +26,7 @@ export default function WebsocketRouter(mockCollection: MockCollection) {
       `)
     })
 
-    function sendTrigger(msg: string | object): void {
+    function sendTrigger(msg: string | object, routeParam: object | null = null): void {
       const content = Mock.mock(msg)
       ws.send(content)
       console.log(`
@@ -38,19 +38,20 @@ export default function WebsocketRouter(mockCollection: MockCollection) {
       `)
     }
 
-    const mockPattern = mockCollection.get(url, method)
-    if (isNull(mockPattern)) {
+    const mockData = mockCollection.get(url, method)
+    if (isNull(mockData)) {
       sendTrigger(`${method} ${url} donesn't have the mock data defination (${currentTime})`)
     } else {
-      if (mockPattern instanceof Function) {
-        mockPattern(sendTrigger)
+      const [mockContent, routeParam] = mockData
+      if (mockContent instanceof Function) {
+        mockContent(sendTrigger)
         ws.addEventListener('message', (e) => {
-          if (getFunctionArguments(mockPattern).length > 1) {
-            mockPattern(sendTrigger, e.data)
+          if (getFunctionArguments(mockContent).length > 1) {
+            mockContent(sendTrigger, e.data, routeParam)
           }
         })
       } else {
-        sendTrigger(mockPattern)
+        sendTrigger(mockContent)
       }
     }
 
