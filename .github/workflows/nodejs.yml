@@ -1,8 +1,8 @@
 name: jMock CI
 
 on: 
-  - push
-    - branches:
+  push:
+    branches:
       - develop
 
 jobs:
