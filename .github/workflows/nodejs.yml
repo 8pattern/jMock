@@ -13,6 +13,7 @@ jobs:
         node-version: [12.x]
 
     steps:
+    - uses: actions/checkout@v1
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
@@ -20,6 +21,6 @@ jobs:
     - name: npm install
       run: |
         npm install
-    - name: npm publish
+    - name: npm run publish
       run: |
         npm run publish
