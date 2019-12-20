@@ -1,7 +1,7 @@
 import express, { Express } from 'express'
 import expressWs from 'express-ws'
 
-import MockCollection, { MockData, AvailableMockParameter } from './mockCollection'
+import MockCollection, { MockData, ValidMockParam } from './mockCollection'
 import HttpMockRouter from './httpMock'
 import WsMockRouter from './websocketMock'
 import { colorConsole, ConsoleColor, ConsoleBgColor, dateformat } from './util'
@@ -47,7 +47,7 @@ export default class JMockServer {
     this.data.load(mockData)
   }
 
-  append(path: string, method: string, content: AvailableMockParameter) {
+  append(path: string, method: string, content: ValidMockParam) {
     if (content) {
       this.data.set(path, method, content)
     }

@@ -1,17 +1,17 @@
-import { isNull } from "util"
+import { getLegalMethod, exactMatchRoute, fuzzyMatchRoute, regMatchRoute, MatchParam } from './util'
 
-interface MockCallbackFunction {
-  (msg: string): void
+interface MockCallback {
+  (msg: object | string): void
 }
 
-interface MockContentFunction {
-  (callback: MockCallbackFunction, ...args: unknown[]): void
+interface MockFn {
+  (callback: MockCallback, ...args: unknown[]): void
 }
 
-export type AvailableMockParameter = object | string | MockContentFunction
+export type ValidMockParam = object | string | MockFn
 
 interface MockContent {
-  [method: string]: AvailableMockParameter
+  [method: string]: ValidMockParam
 }
 
 export interface MockData {
@@ -23,14 +23,6 @@ export default class MockCollection {
 
   constructor(mockData: MockData = {}) {
     this.load(mockData)
-  }
-
-  private static getLegalUrl(url: string): string {
-    return ('/' + url).replace(/^\/+/, '/')
-  }
-
-  private static getLegalMethod(method: string): string {
-    return method.toUpperCase()
   }
 
   load(mockData: MockData = {}) {
@@ -45,41 +37,38 @@ export default class MockCollection {
       })
   }
 
-  set(url: string, method: string, content: AvailableMockParameter): void {
-    const legalUrl = MockCollection.getLegalUrl(url)
-    const legalMethod = MockCollection.getLegalMethod(method)
-    this.data[legalUrl] = this.data[legalUrl] || {}
-    this.data[legalUrl][legalMethod] = content
+  set(url: string, method: string, content: ValidMockParam): void {
+    const { data } = this
+    const legalMethod = getLegalMethod(method)
+    data[url] = data[url] || {}
+    data[url][legalMethod] = content
   }
 
   delete(url: string, method: string): boolean {
-    const legalUrl = MockCollection.getLegalUrl(url)
-    const legalMethod = MockCollection.getLegalMethod(method)
-    if (this.data[legalUrl]) {
-      if (this.data[legalUrl][legalMethod]) {
-        Reflect.deleteProperty(this.data[legalUrl], legalMethod)
-        return true
-      }
+    const { data } = this
+    const legalMethod = getLegalMethod(method)
+    if (data[url] && data[url][legalMethod]) {
+      Reflect.deleteProperty(data[url], legalMethod)
+      return true
     }
     return false
   }
 
-  get(url: string, method: string): AvailableMockParameter | null {
-    return this.exactMatch(url, method) || this.regMatch(url, method)
-  }
+  get(url: string, method: string): [ValidMockParam, MatchParam] | null {
+    const legalMethod = getLegalMethod(method)
+    let matchFn = [exactMatchRoute, fuzzyMatchRoute, regMatchRoute]
+    let matchResult: [ValidMockParam, MatchParam] | null = null
 
-  exactMatch(url: string, method: string): AvailableMockParameter | null {
-    const legalUrl = MockCollection.getLegalUrl(url)
-    const legalMethod = MockCollection.getLegalMethod(method)
-    const urlContent = this.data[legalUrl]
-    if (!urlContent) {
-      return null
-    }
-    return urlContent[legalMethod] || null
-  }
-
-  regMatch(url: string, method: string): AvailableMockParameter | null {
-    const matchedUrl = Object.keys(this.data).find(urlPattern => (new RegExp(`^${urlPattern}$`)).test(url)) || null
-    return isNull(matchedUrl) ? null : this.exactMatch(matchedUrl, method)
+    Object.entries(this.data)
+      .forEach(([urlPattern, mockContent]) => {
+        matchFn.forEach((fn, index) => {
+          const matchRes = fn(url, urlPattern)
+          if (matchRes.isMatch) {
+            matchResult = [mockContent[legalMethod], matchRes.param]
+            matchFn = matchFn.slice(0, index)
+          }
+        })
+      })
+    return matchResult
   }
 }

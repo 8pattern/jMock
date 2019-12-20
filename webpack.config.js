@@ -23,7 +23,7 @@ module.exports = (_, args) => {
       publicPath: '',
       libraryTarget: 'umd2',
       libraryExport: 'default',
-      library: 'jLogger',
+      library: 'jmock',
     },
     resolve: {
       extensions: ['.ts', '.js', '.json'],

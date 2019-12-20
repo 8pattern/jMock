@@ -1,25 +1,39 @@
 #!/usr/bin/env node
+const path = require('path')
+const fs = require('fs')
 
 const JMock = require('./dist/jmock')
 
-const args = {}
-process.argv.slice(2).forEach((arg) => {
-  if (/--?(.+)=(.+)/.test(arg)) {
-    args[RegExp.$1] = RegExp.$2
-  }
-})
+let port = 3000
+let filePath = null
+const jCommand = require('@8pattern/jcommand')
 
-let port = args.port || args.p || 3000
+jCommand
+  .fuzzy(['p', 'port'], (cmd) => {
+    port = cmd.value || port
+  })
+  .fuzzy(['f', 'file'], (cmd) => {
+    filePath = cmd.value || filePath
+  })
 
-let filePath = args.file || args.f
 let data = {}
 if (filePath) {
   try {
-    data = require(require('path').resolve(filePath))
+    data = require(path.resolve(filePath))
+    const jmock = new JMock(data)
+    jmock.start(port)
+
+    fs.watch(filePath, {}, () => {
+      try {
+        data = require(path.resolve(filePath))
+        jmock.update(data)
+        console.log('mock data updated from ' + filePath)
+      } catch (e) {
+        console.error('Something error occurs when updating data file: \n' + e)
+      }
+    })
   } catch(e) {
     console.error('Something error occurs when loading data file: \n' + e)
   }
 }
 
-const jmock = new JMock(data)
-jmock.start(port)

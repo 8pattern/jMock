@@ -9,8 +9,14 @@ import { colorConsole, ConsoleColor, ConsoleBgColor, dateformat } from '../util'
 export default function HttpRouter(mockCollection: MockCollection) {
   const router = express.Router()
 
-  router.use(bodyParser.urlencoded({ extended: true }))
   router.use(bodyParser.json())
+
+  router.all('*', (req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*')
+    res.header('Access-Control-Allow-Headers', 'Authorization, Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, X-Requested-By, If-Modified-Since, X-File-Name, X-File-Type, Cache-Control, Origin')
+    res.header('Access-Control-Allow-Methods', 'PUT,POST,GET,DELETE,OPTIONS')
+    next()
+  })
 
   router.all('*', (req, res) => {
     const { url: originUrl, method } = req
@@ -33,15 +39,16 @@ export default function HttpRouter(mockCollection: MockCollection) {
       res.send(content)
     }
 
-    const mockPattern = mockCollection.get(url, method)
+    const mockData = mockCollection.get(url, method)
 
-    if (isNull(mockPattern)) {
+    if (isNull(mockData)) {
       sendTrigger(`${method} ${url} donesn't have the mock data defination (${currentTime})`)
     } else {
-      if (mockPattern instanceof Function) {
-        mockPattern(sendTrigger, requestParam)
+      const [mockContent, routeParam] = mockData
+      if (mockContent instanceof Function) {
+        mockContent(sendTrigger, requestParam, routeParam)
       } else {
-        sendTrigger(mockPattern)
+        sendTrigger(mockContent)
       }
     }
   })

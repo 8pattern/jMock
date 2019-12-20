@@ -4,8 +4,11 @@
   "description": "a mock server for JS",
   "scripts": {
     "dev": "ts-node-dev ./src",
+    "prebuild": "tsc && npm run test",
     "build": "webpack --mode=production",
-    "test": "jest"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "publish": "npm run build && npm publish --access=public"
   },
   "keywords": [
     "mock",
@@ -35,6 +38,7 @@
     "webpack-cli": "^3.3.9"
   },
   "dependencies": {
+    "@8pattern/jcommand": "^0.1.0",
     "express": "^4.17.1",
     "express-ws": "^4.0.0",
     "mockjs": "^1.0.1-beta3"
