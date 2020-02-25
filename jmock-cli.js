@@ -25,6 +25,7 @@ if (filePath) {
 
     fs.watch(filePath, {}, () => {
       try {
+        Reflect.deleteProperty(require.cache, require.resolve(filePath)) // delete the cached module
         data = require(path.resolve(filePath))
         jmock.update(data)
         console.log('mock data updated from ' + filePath)
